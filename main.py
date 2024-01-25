@@ -1,5 +1,6 @@
 import argparse
 import os
+import typing
 
 from datetime import datetime
 
@@ -29,14 +30,7 @@ def init_logger(args: argparse.Namespace,
     return logger
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--logger_print', type=int, help='로그 콘솔 출력 여부 true=1, false=0', default=0)
-    parser.add_argument('--start_year', type=int, help='크롤링 시작 년도', default=2010)
-    parser.add_argument('--end_year', type=int, help='크롤링 마감 년도', default=2023)
-    parser.add_argument('--split', type=int, help='크롤러 스레드 개수', default=1)
-    args = parser.parse_args()
-
+def find_interval(args: argparse.Namespace) -> typing.List[typing.Tuple[int, int]]:
     start_year, end_year = int(args.start_year), int(args.end_year)
     split_count = int(args.split)
 
@@ -51,4 +45,16 @@ if __name__ == '__main__':
         end = start + base_length + (1 if i < remainder else 0) - 1
         intervals.append((start, end))
         start = end + 1
-    print(intervals)
+
+    return intervals
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--logger_print', type=int, help='로그 콘솔 출력 여부 true=1, false=0', default=0)
+    parser.add_argument('--start_year', type=int, help='크롤링 시작 년도', default=2010)
+    parser.add_argument('--end_year', type=int, help='크롤링 마감 년도', default=2023)
+    parser.add_argument('--split', type=int, help='크롤러 스레드 개수', default=1)
+    args = parser.parse_args()
+
+    intervals = find_interval(args)
