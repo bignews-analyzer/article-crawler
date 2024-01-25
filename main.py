@@ -36,3 +36,19 @@ if __name__ == '__main__':
     parser.add_argument('--end_year', type=int, help='크롤링 마감 년도', default=2023)
     parser.add_argument('--split', type=int, help='크롤러 스레드 개수', default=1)
     args = parser.parse_args()
+
+    start_year, end_year = int(args.start_year), int(args.end_year)
+    split_count = int(args.split)
+
+    total_length = end_year - start_year + 1
+    base_length = total_length // split_count
+    remainder = total_length % split_count
+
+    intervals = []
+    start = start_year
+
+    for i in range(split_count):
+        end = start + base_length + (1 if i < remainder else 0) - 1
+        intervals.append((start, end))
+        start = end + 1
+    print(intervals)
