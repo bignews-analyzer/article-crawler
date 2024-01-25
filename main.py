@@ -18,9 +18,6 @@ def init_logger(args: argparse.Namespace,
     if args.logger_print == 1:
         logger.add_stream_handler()
 
-    # logger_file_name = datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + '.log'
-    # logger_file_path = './logs'
-
     if not os.path.isdir(logger_file_path):
         os.makedirs(logger_file_path)
 
@@ -57,4 +54,12 @@ if __name__ == '__main__':
     parser.add_argument('--split', type=int, help='크롤러 스레드 개수', default=1)
     args = parser.parse_args()
 
-    intervals = find_interval(args)
+    try:
+        intervals = find_interval(args)
+        logger_file_path = f'./logs/{datetime.now().strftime("%Y_%m_%d_%H_%M_%S")}'
+        for idx, i in enumerate(intervals):
+            logger_name = f'{i[0]}_{i[1]}'
+            logger_file_name = f'{logger_name}_crawler.log'
+            logger = init_logger(args, logger_name, 'debug', logger_file_path, logger_file_name)
+    except:
+        pass
