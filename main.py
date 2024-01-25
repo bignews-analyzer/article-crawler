@@ -31,5 +31,8 @@ def init_logger(args: argparse.Namespace,
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--logger_print', type=int, help='로그 콘솔 출력 여부 true는 1/false는 0', default=0)
+    parser.add_argument('--logger_print', type=int, help='로그 콘솔 출력 여부 true=1, false=0', default=0)
+    parser.add_argument('--start_year', type=int, help='크롤링 시작 년도', default=2010)
+    parser.add_argument('--end_year', type=int, help='크롤링 마감 년도', default=2023)
+    parser.add_argument('--split', type=int, help='크롤러 스레드 개수', default=1)
     args = parser.parse_args()
