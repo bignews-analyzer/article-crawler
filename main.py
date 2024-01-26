@@ -51,10 +51,16 @@ def find_interval(args: argparse.Namespace) -> typing.List[typing.Tuple[int, int
 def start_crawler_thread(idx: int,
                          logger: logger.default_logger.Logger,
                          year_interval: typing.Tuple[int, int]):
-    daum_crawler = DaumArticleCrawler(logger.get_logger())
-    for _ in range(1000000000):pass
-    daum_crawler.close()
-    print(f'{idx} close')
+    logger = logger.get_logger()
+    try:
+        logger.debug(f'{idx} thread init')
+
+        daum_crawler = DaumArticleCrawler(logger)
+        for _ in range(1000000000): pass
+        daum_crawler.close()
+        logger.debug(f'{idx} thread finish')
+    except:
+        logger.exception(f'{idx} thread error occurred')
 
 
 if __name__ == '__main__':
@@ -65,21 +71,29 @@ if __name__ == '__main__':
     parser.add_argument('--split', type=int, help='크롤러 스레드 개수', default=1)
     args = parser.parse_args()
 
+    logger_file_path = f'./logs/{datetime.now().strftime("%Y_%m_%d_%H_%M_%S")}'
+    main_logger = init_logger(args, 'main_logger', 'debug', logger_file_path, '0_main.log').get_logger()
+    main_logger.debug('main logger init')
+
     try:
         intervals = find_interval(args)
-        logger_file_path = f'./logs/{datetime.now().strftime("%Y_%m_%d_%H_%M_%S")}'
+        main_logger.debug(f'interval count: {len(intervals)}\tinterval: {intervals}')
 
         threads = []
+        main_logger.debug('threads init')
         for idx, i in enumerate(intervals):
             logger_name = f'{i[0]}_{i[1]}'
             logger_file_name = f'{logger_name}_crawler.log'
             logger = init_logger(args, logger_name, 'debug', logger_file_path, logger_file_name)
+            main_logger.debug(f'{idx} thread logger init')
 
             thread = threading.Thread(target=start_crawler_thread, args=(idx, logger, i))
             thread.start()
+            main_logger.debug(f'{idx} thread start')
             threads.append(thread)
 
         for thread in threads:
             thread.join()
     except:
-        pass
+        if main_logger is not None:
+            main_logger.exception('critical error occurred')
