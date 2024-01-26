@@ -26,7 +26,7 @@ class DaumArticleCrawler(DefaultCrawler):
 
     def __loop_day(self, date_str: str):
         page = 1
-        max_page = 300
+        max_page = 480
         while True:
             url = self._base_url + f'?page={page}&regDate={date_str}'
             self._driver.get(url)
