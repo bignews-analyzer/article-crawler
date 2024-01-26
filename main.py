@@ -55,8 +55,8 @@ def start_crawler_thread(idx: int,
     try:
         logger.debug(f'{idx} thread init')
 
-        daum_crawler = DaumArticleCrawler(logger)
-        for _ in range(1000000000): pass
+        daum_crawler = DaumArticleCrawler(logger, year_interval[0], year_interval[1])
+        daum_crawler.start()
         daum_crawler.close()
         logger.debug(f'{idx} thread finish')
     except:
