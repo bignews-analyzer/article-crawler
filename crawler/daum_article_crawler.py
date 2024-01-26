@@ -25,14 +25,25 @@ class DaumArticleCrawler(DefaultCrawler):
         self._base_url = 'https://news.daum.net/breakingnews/politics'
 
     def __loop_day(self, date_str: str):
-        url = self._base_url + f'?page=1&regDate={date_str}'
-        self._driver.get(url)
-        self._logger.debug(f'{url} loaded')
+        page = 1
+        max_page = 300
+        while True:
+            url = self._base_url + f'?page={page}&regDate={date_str}'
+            self._driver.get(url)
+            time.sleep(0.05)
 
-        news_items = self._driver.find_elements(By.CSS_SELECTOR, '.list_news2 > li')
-        self._logger.debug(f'news items: {len(news_items)}')
+            page_next_button = self._driver.find_element(By.CSS_SELECTOR, '.btn_page.btn_next')
+            if page_next_button is None:
+                max_page = max(map(lambda x: int(x.text), self._driver.find_elements(By.CLASS_NAME, 'num_page')))
 
-        time.sleep(5)
+            self._logger.debug(f'date: {date_str}\tpage: {page}\t{url} loaded')
+
+            news_items = self._driver.find_elements(By.CSS_SELECTOR, '.list_news2 > li')
+            self._logger.debug(f'news items count: {len(news_items)}')
+
+            page += 3
+            if page > max_page:
+                break
 
     def start(self):
         self._logger.debug('crawling start')
