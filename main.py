@@ -30,7 +30,7 @@ def init_logger(args: argparse.Namespace,
 
 
 def find_interval(args: argparse.Namespace) -> typing.List[typing.Tuple[int, int]]:
-    start_year, end_year = int(args.start_year), int(args.end_year)
+    start_year, end_year = int(args.start_day[0:4]), int(args.end_day[0:4])
     split_count = int(args.split)
 
     total_length = end_year - start_year + 1
@@ -66,8 +66,8 @@ def start_crawler_thread(idx: int,
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--logger_print', type=int, help='로그 콘솔 출력 여부 true=1, false=0', default=0)
-    parser.add_argument('--start_year', type=int, help='크롤링 시작 년도', default=2010)
-    parser.add_argument('--end_year', type=int, help='크롤링 마감 년도', default=2023)
+    parser.add_argument('--start_day', type=str, help='크롤링 시작일 yyyymmdd', default='20101001')
+    parser.add_argument('--end_day', type=str, help='크롤링 마감일 yyyymmdd', default='20231231')
     parser.add_argument('--split', type=int, help='크롤러 스레드 개수', default=1)
     args = parser.parse_args()
 
