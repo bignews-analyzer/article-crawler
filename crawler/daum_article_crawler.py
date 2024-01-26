@@ -11,3 +11,6 @@ class DaumArticleCrawler(DefaultCrawler):
                  open_window: bool = True,
                  proxy: str = None):
         super().__init__(logger, port, container_name, open_window, proxy)
+
+    def close(self):
+        super().close()

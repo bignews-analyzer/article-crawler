@@ -5,6 +5,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.chrome.service import Service
 
+from crawler.crawler_exception import *
+
 import platform
 
 
@@ -42,21 +44,29 @@ class DefaultCrawler:
             options.add_argument('user-agent=' + user_agent)
 
             self._logger.info('system os: Linux')
-            self._driver = webdriver.Remote(
-                f'http://selenium-hub:{port}/wd/hub',
-                DesiredCapabilities.CHROME,
-                options=options
-            )
+            try:
+                self._driver = webdriver.Remote(
+                    f'http://selenium-hub:{port}/wd/hub',
+                    DesiredCapabilities.CHROME,
+                    options=options
+                )
+            except:
+                self._logger.exception("chrome cannot open")
+                raise ChromeCannotOpenError
             self._logger.info('chrome connected')
         else:
             user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
             options.add_argument('user-agent=' + user_agent)
 
             self._logger.info('system os: others')
-            self._driver = webdriver.Chrome(
-                service=Service(ChromeDriverManager().install()),
-                options=options
-            )
+            try:
+                self._driver = webdriver.Chrome(
+                    service=Service(ChromeDriverManager().install()),
+                    options=options
+                )
+            except:
+                self._logger.exception("chrome cannot open")
+                raise ChromeCannotOpenError
             self._logger.info('chrome connected')
         self._logger.info(f'connected chrome browser')
 

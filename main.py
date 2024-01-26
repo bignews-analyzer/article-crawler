@@ -1,11 +1,13 @@
 import argparse
 import os
 import typing
+import threading
 
 from datetime import datetime
 
 import logger.default_logger
 from logger.default_logger import Logger
+from crawler.daum_article_crawler import DaumArticleCrawler
 
 
 def init_logger(args: argparse.Namespace,
@@ -46,6 +48,15 @@ def find_interval(args: argparse.Namespace) -> typing.List[typing.Tuple[int, int
     return intervals
 
 
+def start_crawler_thread(idx: int,
+                         logger: logger.default_logger.Logger,
+                         year_interval: typing.Tuple[int, int]):
+    daum_crawler = DaumArticleCrawler(logger.get_logger())
+    for _ in range(1000000000):pass
+    daum_crawler.close()
+    print(f'{idx} close')
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--logger_print', type=int, help='로그 콘솔 출력 여부 true=1, false=0', default=0)
@@ -57,9 +68,18 @@ if __name__ == '__main__':
     try:
         intervals = find_interval(args)
         logger_file_path = f'./logs/{datetime.now().strftime("%Y_%m_%d_%H_%M_%S")}'
+
+        threads = []
         for idx, i in enumerate(intervals):
             logger_name = f'{i[0]}_{i[1]}'
             logger_file_name = f'{logger_name}_crawler.log'
             logger = init_logger(args, logger_name, 'debug', logger_file_path, logger_file_name)
+
+            thread = threading.Thread(target=start_crawler_thread, args=(idx, logger, i))
+            thread.start()
+            threads.append(thread)
+
+        for thread in threads:
+            thread.join()
     except:
         pass
