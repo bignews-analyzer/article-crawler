@@ -28,21 +28,25 @@ class DaumArticleCrawler(DefaultCrawler):
         page = 1
         max_page = 480
         while True:
-            url = self._base_url + f'?page={page}&regDate={date_str}'
-            self._driver.get(url)
-            time.sleep(0.05)
+            try:
+                url = self._base_url + f'?page={page}&regDate={date_str}'
+                self._driver.get(url)
+                time.sleep(0.05)
 
-            page_next_button = self._driver.find_element(By.CSS_SELECTOR, '.btn_page.btn_next')
-            if page_next_button is None:
-                max_page = max(map(lambda x: int(x.text), self._driver.find_elements(By.CLASS_NAME, 'num_page')))
+                page_next_button = self._driver.find_element(By.CSS_SELECTOR, '.btn_page.btn_next')
+                if page_next_button is None:
+                    max_page = max(map(lambda x: int(x.text), self._driver.find_elements(By.CLASS_NAME, 'num_page')))
 
-            self._logger.debug(f'date: {date_str}\tpage: {page}\t{url} loaded')
+                self._logger.debug(f'date: {date_str}\tpage: {page}\t{url} loaded')
 
-            news_items = self._driver.find_elements(By.CSS_SELECTOR, '.list_news2 > li')
-            self._logger.debug(f'news items count: {len(news_items)}')
+                news_items = self._driver.find_elements(By.CSS_SELECTOR, '.list_news2 > li')
+                self._logger.debug(f'news items count: {len(news_items)}')
+            except:
+                self._logger.exception(f'date: {date_str}\tpage: {page} error occurred')
 
             page += 3
             if page > max_page:
+                self._logger.debug(f'date: {date_str}\tpage: {page} finish')
                 break
 
     def start(self):
