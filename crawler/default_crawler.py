@@ -26,6 +26,13 @@ class DefaultCrawler:
                       port: int,
                       proxy: str):
         options = webdriver.ChromeOptions()
+        options.add_argument('headless')
+        options.add_argument("--blink-settings=imagesEnabled=false")
+        # prefs = {
+        #     "profile.managed_default_content_settings.images": 2,
+        #     "profile.managed_default_content_settings.videos": 2
+        # }
+        # options.add_experimental_option("prefs", prefs)
 
         if proxy is not None:
             self._logger.info(f'proxy enable - {proxy}')

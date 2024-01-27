@@ -28,7 +28,7 @@ class DaumArticleCrawler(DefaultCrawler):
         self.__date = self.__start_data
         self.__db_helper = db_helper
         self.__article_data_batch = []
-        self.__batch_limit = 1000
+        self.__batch_limit = 150
         self.__total_count = 0
         self._base_url = 'https://news.daum.net/breakingnews/politics'
         self._logger.debug(f'crawler init')
