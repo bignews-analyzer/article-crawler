@@ -150,13 +150,14 @@ class DaumArticleRequestCrawler():
         soup = BeautifulSoup(response.text, 'html.parser')
 
         company_name = soup.select_one('#kakaoServiceLogo').text
+        title = soup.select_one('.tit_view').text
 
         content = ''
         for p in soup.select('.article_view > section > p'):
             content += p.text
-        self._logger.debug(f'get content finish\tlength: {len(content)}\tcompany: {company_name}\tlink: {news_link}')
+        self._logger.debug(f'get content finish\tlength: {len(content)}\tcompany: {company_name}\ttitle: {title}\tlink: {news_link}')
 
-        self.__article_data_batch.append((None, company_name, content, news_link))
+        self.__article_data_batch.append((None, company_name, title, content, news_link))
         self.__check_batch_insert()
         self.__total_count += 1
         self._logger.debug(f'article parsing finish\ttotal: {self.__total_count}\tbatch size: {len(self.__article_data_batch)}')

@@ -1,6 +1,7 @@
 SQL_ARTICLE_TABLE_CREATE = '''CREATE TABLE article (
 	"id"	INTEGER,
 	"company"	INTEGER,
+	"title"	TEXT NOT NULL,
 	"content"	TEXT NOT NULL,
 	"url"	TEXT NOT NULL,
 	PRIMARY KEY("id" AUTOINCREMENT)

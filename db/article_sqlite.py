@@ -19,7 +19,7 @@ class ArticleSqliteHelper(SqliteHelper):
         self._logger.debug(f'article table created')
 
     def insert_values(self, values: typing.List[typing.Any]):
-        self._conn.executemany('INSERT INTO article VALUES (?,?,?,?)', values)
+        self._conn.executemany('INSERT INTO article VALUES (?,?,?,?,?)', values)
         self._conn.commit()
         self._logger.debug(f'{len(values)} values inserted')
 
