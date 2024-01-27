@@ -1,7 +1,11 @@
 import logging
 import time
+import typing
 
 from datetime import date, timedelta
+
+import selenium.webdriver.remote.webelement
+
 from crawler.default_crawler import DefaultCrawler
 
 from selenium.webdriver.common.by import By
@@ -24,6 +28,10 @@ class DaumArticleCrawler(DefaultCrawler):
         self._logger.debug(f'crawler init')
         self._base_url = 'https://news.daum.net/breakingnews/politics'
 
+    def __get_article(self, news_link: str):
+        self._logger.debug(f'article parsing start {news_link}')
+
+
     def __loop_day(self, date_str: str):
         page = 1
         max_page = 480
@@ -33,14 +41,22 @@ class DaumArticleCrawler(DefaultCrawler):
                 self._driver.get(url)
                 time.sleep(0.05)
 
-                page_next_button = self._driver.find_element(By.CSS_SELECTOR, '.btn_page.btn_next')
-                if page_next_button is None:
+                try:
+                    self._driver.find_element(By.CSS_SELECTOR, '.btn_page.btn_next')
+                except:
                     max_page = max(map(lambda x: int(x.text), self._driver.find_elements(By.CLASS_NAME, 'num_page')))
 
                 self._logger.debug(f'date: {date_str}\tpage: {page}\t{url} loaded')
 
                 news_items = self._driver.find_elements(By.CSS_SELECTOR, '.list_news2 > li')
                 self._logger.debug(f'news items count: {len(news_items)}')
+
+                for idx, item in enumerate(news_items):
+                    try:
+                        link = item.find_element(By.CSS_SELECTOR, '.tit_thumb > .link_txt').get_attribute("href")
+                        self.__get_article(link)
+                    except:
+                        self._logger.exception(f'date: {date_str}\tpage: {page}\tnum: {idx} load article error occurred')
             except:
                 self._logger.exception(f'date: {date_str}\tpage: {page} error occurred')
 
