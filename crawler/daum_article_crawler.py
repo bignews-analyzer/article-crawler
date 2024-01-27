@@ -25,12 +25,17 @@ class DaumArticleCrawler(DefaultCrawler):
         self.__start_data = date(start_year, 1, 1)
         self.__end_date = date(end_year, 12, 31)
         self.__date = self.__start_data
-        self._logger.debug(f'crawler init')
         self._base_url = 'https://news.daum.net/breakingnews/politics'
+        self._logger.debug(f'crawler init')
 
     def __get_article(self, news_link: str):
         self._logger.debug(f'article parsing start {news_link}')
+        self._driver.get(news_link)
 
+        content = ''
+        for p in self._driver.find_elements(By.CSS_SELECTOR, '.article_view > section > p'):
+            content += p.text
+        self._logger.debug(f'content length: {len(content)} get content finish')
 
     def __loop_day(self, date_str: str):
         page = 1
@@ -49,11 +54,13 @@ class DaumArticleCrawler(DefaultCrawler):
                 self._logger.debug(f'date: {date_str}\tpage: {page}\t{url} loaded')
 
                 news_items = self._driver.find_elements(By.CSS_SELECTOR, '.list_news2 > li')
-                self._logger.debug(f'news items count: {len(news_items)}')
+                news_links = []
+                for item in news_items:
+                    news_links.append(item.find_element(By.CSS_SELECTOR, '.tit_thumb > .link_txt').get_attribute("href"))
+                self._logger.debug(f'news items count: {len(news_links)}')
 
-                for idx, item in enumerate(news_items):
+                for idx, link in enumerate(news_links):
                     try:
-                        link = item.find_element(By.CSS_SELECTOR, '.tit_thumb > .link_txt').get_attribute("href")
                         self.__get_article(link)
                     except:
                         self._logger.exception(f'date: {date_str}\tpage: {page}\tnum: {idx} load article error occurred')
