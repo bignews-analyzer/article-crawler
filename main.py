@@ -9,7 +9,7 @@ import logger.default_logger
 from logger.default_logger import Logger
 from db.article_sqlite import ArticleSqliteHelper
 
-from crawler.daum_article_crawler import DaumArticleCrawler
+from crawler.daum_article_crawler import DaumArticleRequestCrawler
 
 
 def init_logger(args: argparse.Namespace,
@@ -21,9 +21,6 @@ def init_logger(args: argparse.Namespace,
 
     if args.logger_print == 1:
         logger.add_stream_handler()
-
-    if not os.path.isdir(logger_file_path):
-        os.makedirs(logger_file_path)
 
     logger_file_path = os.path.join(logger_file_path, logger_file_name)
     logger.add_file_handler(logger_file_path)
@@ -60,16 +57,13 @@ def start_crawler_thread(idx: int,
     logger.debug(f'{idx} logger init')
 
     db_file_name = f'{logger_name}_db.db'
-    if not os.path.isdir(db_file_path):
-        os.makedirs(db_file_path)
     db = ArticleSqliteHelper(logger, os.path.join(db_file_path, db_file_name))
 
     try:
         logger.debug(f'{idx} thread init')
 
-        daum_crawler = DaumArticleCrawler(logger, db, year_interval[0], year_interval[1])
+        daum_crawler = DaumArticleRequestCrawler(logger, db, year_interval[0], year_interval[1])
         daum_crawler.start()
-        daum_crawler.close()
         logger.debug(f'{idx} thread finish')
     except:
         logger.exception(f'{idx} thread error occurred')
@@ -86,6 +80,11 @@ if __name__ == '__main__':
     now_str = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
     logger_file_path = f'./logs/{now_str}'
     db_file_path = f'./data/{now_str}'
+
+    if not os.path.isdir(logger_file_path):
+        os.makedirs(logger_file_path)
+    if not os.path.isdir(db_file_path):
+        os.makedirs(db_file_path)
 
     main_logger = init_logger(args, 'main_logger', 'debug', logger_file_path, '0_main.log').get_logger()
     main_logger.debug('main logger init')
