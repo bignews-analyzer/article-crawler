@@ -27,17 +27,32 @@ class DaumArticleCrawler(DefaultCrawler):
         self.__end_date = date(end_year, 12, 31)
         self.__date = self.__start_data
         self.__db_helper = db_helper
+        self.__article_data_batch = []
+        self.__batch_limit = 1000
         self._base_url = 'https://news.daum.net/breakingnews/politics'
         self._logger.debug(f'crawler init')
+
+    def __check_batch_insert(self):
+        if len(self.__article_data_batch) >= self.__batch_limit:
+            try:
+                self.__db_helper.insert_values(self.__article_data_batch)
+                self.__article_data_batch.clear()
+            except:
+                self._logger.exception('db insert data error occurred')
 
     def __get_article(self, news_link: str):
         self._logger.debug(f'article parsing start {news_link}')
         self._driver.get(news_link)
 
+        company_name = self._driver.find_element(By.CSS_SELECTOR, '#kakaoServiceLogo').text
+
         content = ''
         for p in self._driver.find_elements(By.CSS_SELECTOR, '.article_view > section > p'):
             content += p.text
-        self._logger.debug(f'content length: {len(content)} get content finish')
+        self._logger.debug(f'get content finish\tlength: {len(content)}\tcompany: {company_name}\tlink: {news_link}')
+
+        self.__article_data_batch.append((None, company_name, content, news_link))
+        self.__check_batch_insert()
 
     def __loop_day(self, date_str: str):
         page = 1
@@ -84,6 +99,8 @@ class DaumArticleCrawler(DefaultCrawler):
             self.__loop_day(current_date_str)
 
             self.__date += timedelta(days=1)
+        self._logger.debug('check batch empty')
+        self.__check_batch_insert()
         self._logger.debug('crawling end')
 
     def close(self):

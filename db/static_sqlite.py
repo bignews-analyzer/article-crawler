@@ -1,4 +1,4 @@
-SQL_ARTICLE_TABLE_CREATE = '''CREATE TABLE "article" (
+SQL_ARTICLE_TABLE_CREATE = '''CREATE TABLE article (
 	"id"	INTEGER,
 	"company"	INTEGER,
 	"content"	TEXT NOT NULL,

@@ -16,6 +16,7 @@ class SqliteHelper:
                         create_query: str):
         cursor = self._conn.cursor()
         cursor.execute(create_query)
+        self._conn.commit()
 
     def _close_database(self):
         self._conn.close()

@@ -85,7 +85,7 @@ if __name__ == '__main__':
 
     now_str = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
     logger_file_path = f'./logs/{now_str}'
-    db_file_path = f'./logs/{now_str}'
+    db_file_path = f'./data/{now_str}'
 
     main_logger = init_logger(args, 'main_logger', 'debug', logger_file_path, '0_main.log').get_logger()
     main_logger.debug('main logger init')
