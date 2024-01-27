@@ -5,15 +5,16 @@ import typing
 from datetime import date, timedelta
 
 import selenium.webdriver.remote.webelement
+from selenium.webdriver.common.by import By
 
 from crawler.default_crawler import DefaultCrawler
-
-from selenium.webdriver.common.by import By
+from db.default_sqlite import SqliteHelper
 
 
 class DaumArticleCrawler(DefaultCrawler):
     def __init__(self,
                  logger: logging.Logger,
+                 db_helper: SqliteHelper,
                  start_year: int,
                  end_year: int,
                  port: int = 4444,
@@ -25,6 +26,7 @@ class DaumArticleCrawler(DefaultCrawler):
         self.__start_data = date(start_year, 1, 1)
         self.__end_date = date(end_year, 12, 31)
         self.__date = self.__start_data
+        self.__db_helper = db_helper
         self._base_url = 'https://news.daum.net/breakingnews/politics'
         self._logger.debug(f'crawler init')
 

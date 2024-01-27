@@ -7,6 +7,8 @@ from datetime import datetime
 
 import logger.default_logger
 from logger.default_logger import Logger
+from db.article_sqlite import ArticleSqliteHelper
+
 from crawler.daum_article_crawler import DaumArticleCrawler
 
 
@@ -49,13 +51,23 @@ def find_interval(args: argparse.Namespace) -> typing.List[typing.Tuple[int, int
 
 
 def start_crawler_thread(idx: int,
-                         logger: logger.default_logger.Logger,
+                         logger_file_path: str,
+                         db_file_path: str,
                          year_interval: typing.Tuple[int, int]):
-    logger = logger.get_logger()
+    logger_name = f'{year_interval[0]}_{year_interval[1]}'
+    logger_file_name = f'{logger_name}_crawler.log'
+    logger = init_logger(args, logger_name, 'debug', logger_file_path, logger_file_name).get_logger()
+    logger.debug(f'{idx} logger init')
+
+    db_file_name = f'{logger_name}_db.db'
+    if not os.path.isdir(db_file_path):
+        os.makedirs(db_file_path)
+    db = ArticleSqliteHelper(logger, os.path.join(db_file_path, db_file_name))
+
     try:
         logger.debug(f'{idx} thread init')
 
-        daum_crawler = DaumArticleCrawler(logger, year_interval[0], year_interval[1])
+        daum_crawler = DaumArticleCrawler(logger, db, year_interval[0], year_interval[1])
         daum_crawler.start()
         daum_crawler.close()
         logger.debug(f'{idx} thread finish')
@@ -71,7 +83,10 @@ if __name__ == '__main__':
     parser.add_argument('--split', type=int, help='크롤러 스레드 개수', default=1)
     args = parser.parse_args()
 
-    logger_file_path = f'./logs/{datetime.now().strftime("%Y_%m_%d_%H_%M_%S")}'
+    now_str = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+    logger_file_path = f'./logs/{now_str}'
+    db_file_path = f'./logs/{now_str}'
+
     main_logger = init_logger(args, 'main_logger', 'debug', logger_file_path, '0_main.log').get_logger()
     main_logger.debug('main logger init')
 
@@ -82,12 +97,7 @@ if __name__ == '__main__':
         threads = []
         main_logger.debug('threads init')
         for idx, i in enumerate(intervals):
-            logger_name = f'{i[0]}_{i[1]}'
-            logger_file_name = f'{logger_name}_crawler.log'
-            logger = init_logger(args, logger_name, 'debug', logger_file_path, logger_file_name)
-            main_logger.debug(f'{idx} thread logger init')
-
-            thread = threading.Thread(target=start_crawler_thread, args=(idx, logger, i))
+            thread = threading.Thread(target=start_crawler_thread, args=(idx, logger_file_path, db_file_path, i))
             thread.start()
             main_logger.debug(f'{idx} thread start')
             threads.append(thread)
