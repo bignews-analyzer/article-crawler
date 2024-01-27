@@ -163,7 +163,7 @@ class DaumArticleRequestCrawler():
 
     def __loop_day(self, date_str: str):
         page = 1
-        max_page = 480
+        max_page = 500
         while True:
             try:
                 url = self._base_url + f'?page={page}&regDate={date_str}'
@@ -181,8 +181,8 @@ class DaumArticleRequestCrawler():
 
                 news_items = soup.select('.list_news2 > li')
                 news_links = []
-                for item in news_items:
-                    news_links.append(item.select_one('.tit_thumb > .link_txt').get("href"))
+                for i in range(0, len(news_items), 2):
+                    news_links.append(news_items[i].select_one('.tit_thumb > .link_txt').get("href"))
                 self._logger.debug(f'news items count: {len(news_links)}')
 
                 for idx, link in enumerate(news_links):
@@ -193,7 +193,7 @@ class DaumArticleRequestCrawler():
             except:
                 self._logger.exception(f'date: {date_str}\tpage: {page} error occurred')
 
-            page += 3
+            page += 1
             if page > max_page:
                 self._logger.debug(f'date: {date_str}\tpage: {page} finish')
                 break
