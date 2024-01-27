@@ -29,6 +29,7 @@ class DaumArticleCrawler(DefaultCrawler):
         self.__db_helper = db_helper
         self.__article_data_batch = []
         self.__batch_limit = 1000
+        self.__total_count = 0
         self._base_url = 'https://news.daum.net/breakingnews/politics'
         self._logger.debug(f'crawler init')
 
@@ -53,6 +54,8 @@ class DaumArticleCrawler(DefaultCrawler):
 
         self.__article_data_batch.append((None, company_name, content, news_link))
         self.__check_batch_insert()
+        self.__total_count += 1
+        self._logger.debug(f'article parsing finish\ttotal: {self.__total_count}\tbatch size: {len(self.__article_data_batch)}')
 
     def __loop_day(self, date_str: str):
         page = 1
