@@ -8,13 +8,13 @@ import selenium.webdriver.remote.webelement
 from selenium.webdriver.common.by import By
 
 from crawler.default_crawler import DefaultCrawler
-from db.default_sqlite import SqliteHelper
+from db.article_sqlite import ArticleSqliteHelper
 
 
 class DaumArticleCrawler(DefaultCrawler):
     def __init__(self,
                  logger: logging.Logger,
-                 db_helper: SqliteHelper,
+                 db_helper: ArticleSqliteHelper,
                  start_year: int,
                  end_year: int,
                  port: int = 4444,
@@ -88,3 +88,4 @@ class DaumArticleCrawler(DefaultCrawler):
 
     def close(self):
         super().close()
+        self.__db_helper.close()
