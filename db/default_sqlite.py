@@ -8,14 +8,14 @@ class SqliteHelper:
                  path: str):
         self._logger = logger
         self._conn = sqlite3.connect(path)
-        self._logger.info(f'create database: {path}')
+        self._logger.debug(f'create database: {path}')
         self._conn.execute("PRAGMA encoding = 'UTF-16';")
         self._conn.execute("PRAGMA foreign_keys = ON;")
 
-    def create_database(self,
+    def _create_database(self,
                         create_query: str):
         cursor = self._conn.cursor()
         cursor.execute(create_query)
 
-    def close_database(self):
+    def _close_database(self):
         self._conn.close()
