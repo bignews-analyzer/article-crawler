@@ -176,7 +176,8 @@ class DaumArticleRequestCrawler():
                 soup = BeautifulSoup(response.text, 'html.parser')
 
                 if not soup.select('.btn_page.btn_next'):
-                    max_page = max(map(lambda x: int(x.text), soup.select('.num_page')))
+                    max_page = max(map(lambda x: int(''.join([char for char in x.text if char.isdigit()])), soup.select('.num_page')))
+                    self._logger.debug(f'set max page {max_page}')
 
                 self._logger.debug(f'date: {date_str}\tpage: {page}\t{url} loaded')
 
