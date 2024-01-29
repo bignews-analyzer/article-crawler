@@ -119,12 +119,12 @@ class DaumArticleRequestCrawler():
     def __init__(self,
                  logger: logging.Logger,
                  db_helper: ArticleSqliteHelper,
-                 start_year: int,
-                 end_year: int,):
+                 start: int,
+                 end: int,):
         self._logger = logger
         self.__page = 1
-        self.__start_data = date(start_year, 1, 1)
-        self.__end_date = date(end_year, 12, 31)
+        self.__start_data = date(int(start[:4]), int(start[4:6]), int(start[6:]))
+        self.__end_date = date(int(end[:4]), int(end[4:6]), int(end[6:]))
         self.__date = self.__start_data
         self.__db_helper = db_helper
         self.__article_data_batch = []
